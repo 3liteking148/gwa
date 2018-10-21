@@ -15,9 +15,9 @@ var mode = parseInt(getStorage("mode"));
 var GRADE7 = [["IS","Math","English","Filipino","SocSci","PEHM","ValEd","AdTech","CompSci"],[1.7,1.7,1.3,1,1,0.99,0.7,1,1],["is", "math", "eng", "fil", "ss", "pehm", "ve", "adtech", "cs"]];
 var GRADE8 = [["IS","Math","English","Filipino","SocSci","PEHM","ValEd","AdTech","CompSci", "EarthSci"],[2,1.7,1.3,1,1,0.99,0.7,1,1,0.7],["is", "math", "eng", "fil", "ss", "pehm", "ve", "adtech", "cs", "es"]];
 var GRADE9 = [["Bio","Chem","Physics","Math","English","Filipino","SocSci","PEHM","Stat", "CompSci"],[1,1,1,1,1,1,1,0.99,1,1],["bio", "chem", "p6", "math", "eng", "fil", "ss", "pehm", "stat", "cs"]];
-var GRADE10 = [["Bio","Chem","Physics","Math","English","Filipino","SocSci","PEHM","Research", "CompSci"],[1,1,1,1.3,1,1,1,0.99,1,1],["bio", "chem", "p6", "math", "eng", "fil", "ss", "pehm", "stat", "cs"]];
-var db = [[9, 10, 10, 10, 7], [10.39, 11.39, 9.99, 10.29, 9.4]];
+var GRADE10 = [["Bio","Chem","Physics","Math","English","Filipino","SocSci","PEHM","Research", "CompSci", "Elective"],[1,1,1,1.3,1,1,1,0.99,1,1,1],["bio", "chem", "p6", "math", "eng", "fil", "ss", "pehm", "stat", "cs", "el"]];
 var GRADE11 = [["Science","Math","English","Filipino","SocSci","Research","Elective"],[1.7,1,1,1,1,2,1.7],["science", "math", "eng", "fil", "ss", "research", "elective"]];;
+var db = [[9, 10, 10, 11, 7], [10.39, 11.39, 9.99, 11.29, 9.4]];
 
     function getValue(id) {
         return document.getElementById(id).innerHTML;
@@ -53,6 +53,7 @@ var GRADE11 = [["Science","Math","English","Filipino","SocSci","Research","Elect
         } else if (mode == 10) {
             tmp = getStorage("grade10");
             for (i=0; i<GRADE10[0].length;i++) gradesArray[i] = tmp.substring((i*4),(i*4)+4);
+			if (gradesArray[10] == "") gradesArray[GRADE10[0].length-1] = "1.00"//add elective update
         } else if (mode == 11) {
             tmp = getStorage("grade11");
             for (i=0; i<GRADE10[0].length;i++) gradesArray[i] = tmp.substring((i*4),(i*4)+4);
@@ -113,6 +114,12 @@ var GRADE11 = [["Science","Math","English","Filipino","SocSci","Research","Elect
     function addAddon(){
         appendValue("main", '<hr><table style="border-collapse: collapse;border-radius: 25px;"><tbody><tr><td><input onclick="changegrade2(\'old\', -1)" value="-" type="button"></td><td>Previous Quarter\'s Grade</td><td><span id="old">1.00</span></td><td><input onclick="changegrade2(\'old\', 1)" value="+" type="button"></td></tr><tr><td><input onclick="changegrade2(\'new\', -1)" value="-" type="button"></td><td>Present Quarter\'s Tenta</td><td><span id="new">1.00</span></td><td><input onclick="changegrade2(\'new\', 1)" value="+" type="button"></td></tr></tbody></table><span id="gwa2" style="font-weight:bold;">0.00</span><br>');
     }
+	function truncateStr(num, len){
+		return num.toString().substring(0,len);
+	}
+	function truncateFloat(num, len){
+		return parseFloat(truncateStr(num, len));
+	}
     function generateGWA(){
         var gwa = 0;
         if (mode == 7) for (i=0; i<GRADE7[0].length;i++) gwa += parseFloat(getValue(GRADE7[2][i])) * GRADE7[1][i];
@@ -120,8 +127,8 @@ var GRADE11 = [["Science","Math","English","Filipino","SocSci","Research","Elect
         if (mode == 9) for (i=0; i<GRADE9[0].length;i++) gwa += parseFloat(getValue(GRADE9[2][i])) * GRADE9[1][i];
         if (mode == 10) for (i=0; i<GRADE10[0].length;i++) gwa += parseFloat(getValue(GRADE10[2][i])) * GRADE10[1][i];
         if (mode == 11) for (i=0; i<GRADE11[0].length;i++) gwa += parseFloat(getValue(GRADE11[2][i])) * GRADE11[1][i];
-            gwa = gwa.toPrecision(7) / db[1][mode-7];
-        var stringGWA = gwa.toString().substring(0,5);
+			gwa = gwa / db[1][mode-7];
+        var stringGWA = truncateStr(gwa, 5);
         for (i=stringGWA.length;i<5;i++) if(i==1)stringGWA += "."; else stringGWA += "0";
         setValue('gwa', stringGWA);
     }
@@ -179,27 +186,27 @@ var GRADE11 = [["Science","Math","English","Filipino","SocSci","Research","Elect
 	
     function verify(){
 		    var get2 = (parseFloat(document.getElementById("old").innerHTML) + parseFloat(document.getElementById("new").innerHTML * 2)) / 3;
-    		if (get2 <= 1.125) {
+			if (get2 < 1.126) {
 		    	var final2 = "1.00";
-	    	} else if (get2 <= 1.375) {
+	    	} else if (get2 < 1.376) {
 		    	var final2 = "1.25";
-		    } else if (get2 <= 1.625) {
+		    } else if (get2 < 1.626) {
 		    	var final2 = "1.50";
-		    } else if (get2 <= 1.875) {
+		    } else if (get2 < 1.876) {
 	    		var final2 = "1.75";
-    		} else if (get2 <= 2.125) {
+    		} else if (get2 < 2.126) {
 	    		var final2 = "2.00";
-		    } else if (get2 <= 2.375) {
+		    } else if (get2 < 2.376) {
 		    	var final2 = "2.25";
-	    	} else if (get2 <= 2.625) {
+	    	} else if (get2 < 2.626) {
 	    		var final2 = "2.50";
-		    } else if (get2 <= 2.875) {
+		    } else if (get2 < 2.876) {
 		    	var final2 = "2.75";
-		    } else if (get2 <= 3.5) {
+		    } else if (get2 < 3.501) {
 		    	var final2 = "3.00";
-		    } else if (get2 <= 4.5) {
+		    } else if (get2 < 4.501) {
 		    	var final2 = "4.00";
-		    } else if (get2 <= 5) {
+		    } else if (get2 < 5.001) {
 			    var final2 = "5.00";
 	    	} else {
 			    var final2 = "0.00";
